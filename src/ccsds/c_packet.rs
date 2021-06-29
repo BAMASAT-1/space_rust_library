@@ -317,6 +317,94 @@ impl<'a> Packet<'a> {
     }
 }
 
+
+////////////////////////////////
+/// 
+/// CanBus CCSDS Packet  
+//////////////////////////////////
+
+
+pub struct CANpacket<'a> {
+    buffer: du::HybridVector<'a>
+}
+
+impl <'a>PacketIntf for CANpacket<'a>{
+}
+
+impl<'a> ops::Index<usize> for CANpacket<'a> {
+    type Output = u8;
+    fn index(&self, pos: usize) -> &u8 {
+        self.at(pos)
+    }
+}
+
+impl<'a> du::DUintf for CANpacket<'a> {
+    // returns a read-only reference
+    fn buffer_read_only(&self) -> &[u8] {
+        self.buffer.read_only()
+    }
+    // returns a read-write reference 
+    fn buffer_read_write(&mut self) -> &mut [u8] {
+        self.buffer.read_write()
+    }
+    // change size
+    fn resize(&mut self, new_size: usize) {
+        self.buffer.resize(new_size);
+    }
+}
+
+impl<'a> CANpacket<'a> {
+    //////////////////
+    // constructors //
+    //////////////////
+
+    // default constructor
+    pub fn new() -> CANpacket<'a> {
+        let mut packet = CANpacket {
+            buffer: du::HybridVector::new_alloc(PRIMARY_HEADER_BYTE_SIZE + 1)
+        };
+        packet.set_packet_length().unwrap();
+        packet
+    }
+    // copy constructor
+    pub fn new_clone(value: &Vec<u8>) -> CANpacket<'a> {
+        CANpacket {
+            buffer: du::HybridVector::new_clone(value)
+        }
+    }
+    // allocating constructor
+    pub fn new_alloc(size: usize) -> CANpacket<'a> {
+        let mut packet = CANpacket {
+            buffer: du::HybridVector::new_alloc(size)
+        };
+        packet.set_packet_length().unwrap();
+        packet
+    }
+    // move ownership
+    pub fn new_owner(value: Vec<u8>) -> CANpacket<'a> {
+        CANpacket {
+            buffer: du::HybridVector::new_owner(value)
+        }
+    }
+    // wraps data for read-only
+    pub fn new_read_only(reference: &[u8]) -> CANpacket {
+        CANpacket {
+            buffer: du::HybridVector::new_read_only(reference)
+        }
+    }
+    // wraps data for read-write
+    pub fn new_read_write(reference: &mut [u8]) -> CANpacket {
+        CANpacket {
+            buffer: du::HybridVector::new_read_write(reference)
+        }
+    }
+}
+
+
+///////////////////
+
+
+
 //####################################
 // TMpacket...CCSDS Telemetry Packet #
 //####################################
