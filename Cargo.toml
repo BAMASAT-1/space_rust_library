@@ -21,3 +21,4 @@ authors = ["Stefan Korner <korner-hajek@gmx.at>"]
 [dependencies]
 lazy_static = "1.1.0"
 time = "0.1"
+socketcan = ""
